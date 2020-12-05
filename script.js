@@ -1,29 +1,22 @@
-'use strict'
-class Rectangle {
-    constructor(height, width) {
-        this.height = height;
-        this.width = width;
-    }
+'use strict';
 
-    calcArea() {
-        return this.height * this.width;
-    }
-}
+const inputHrn = document.querySelector('#hrn'),
+    inputUsd = document.querySelector('#usd');
 
-class ColorRactangle extends Rectangle {//наслідується від Rectangle
-    constructor (height, width, text, bgColor) {
-        super(height, width);
-        this.text = text;
-        this.bgColor = bgColor; //викликає параметри родинного класу,завжди прописувати напочатку
-    }
+inputHrn.addEventListener('input', function () {
+    const request = new XMLHttpRequest();
 
-    showMyProps() {
-        console.log(`Текст: ${this.text}, Цвет ${this.bgColor}`)
-    }
-}
+    request.open('GET', 'current.json');
+    request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+    request.send();
 
-const div = new ColorRactangle(25, 10, 'Hello', 'red');
-div.showMyProps();
-console.log(div.calcArea());
-const square = new Rectangle(10, 10);
-console.log(square.calcArea());
+
+    request.addEventListener('load', function () {
+        if (request.status === 200) {
+            const data = JSON.parse(request.response);
+            inputUsd.value = (+inputHrn.value / data.current.usd).toFixed(2);
+        } else {
+            inputUsd.value = 'Server Error';
+        }
+    });
+});
